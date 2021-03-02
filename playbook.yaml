@@ -1,0 +1,53 @@
+---
+- hosts: localhost
+  become: true 
+  tasks:
+  - name: Install apache httpd  (state=present is optional)
+    apt:
+      name: 
+      - git
+      - apache2
+
+- hosts: CSR1kv
+  gather_facts: true
+  tasks:
+    - debug: msg="{{ansible_facts['net_hostname']}}"
+
+    - name: first task
+      ios_command:
+        commands: show version
+      register: version
+
+    - debug: msg="{{version}}"
+
+#    - name: change hostname
+#      ios_config:
+#        lines: hostname {{ inventory_hostname }}
+
+    - ios_facts:
+
+    - debug: msg="{{ansible_facts.net_hostname}}"
+
+    - name: gather config
+      ios_facts:
+        gather_subset: config
+      register: config
+
+    - debug: msg="{{config}}"
+
+    - set_fact:
+        conf_path: "{{playbook_dir}}/configs/{{ansible_facts.net_model}}"
+        conf_name: "{{ansible_facts.net_hostname}}-{{ansible_host}}-{{ansible_facts['net_serialnum']}}"
+
+
+    - name: Create dir
+      file:
+        path: "{{conf_path}}"
+        state: directory
+      delegate_to: localhost
+      #run_once: true
+
+    - name: save config
+      copy:
+       content: "{{config.ansible_facts.ansible_net_config}}"
+       dest: "{{conf_path}}/{{conf_name}}"
