@@ -1,0 +1,10 @@
+[CSR1kv]
+192.168.56.102 ansible_host=192.168.56.102
+192.168.56.103 ansible_host=192.168.56.103
+
+
+[CSR1kv:vars]
+ansible_connection=network_cli
+ansible_user=cisco
+ansible_password='cisco123!'
+ansible_network_os=ios

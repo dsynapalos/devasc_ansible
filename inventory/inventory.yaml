@@ -1,7 +1,0 @@
-CSR1kv:
-  hosts:
-    host1:
-      ansible_host=192.168.56.102
-    host2:
-      ansible_host=192.168.56.103
-

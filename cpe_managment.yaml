@@ -1,0 +1,11 @@
+---
+- hosts: CSR1kv
+  become: true 
+  roles:
+    - identify_vendor
+
+    - role: do_something_cisco
+      when: Vendor == 'cisco'
+    
+    - role: do_something_fortinet
+      when: Vendor == 'fortinet'

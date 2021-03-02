@@ -1,0 +1,36 @@
+---
+- name: Include vars of vars.json 
+  include_vars:
+    file: vars.json
+    name: included_vars
+
+- name: Run python 
+  script: hello.py
+  args:
+    executable: "{{ansible_playbook_python}}"
+  environment:
+    HOST: "{{ansible_host}}"
+    COMMUNITY: "{{included_vars.community}}"
+  ignore_errors: True
+  delegate_to: localhost
+  register: python
+  retries: 1
+  delay: 0
+  until: python is succeeded
+
+- name: report failure
+  debug: 
+    msg: "{{ansible_host}} has failed"  
+  when: python is failed
+
+- name: fail
+  fail:
+  when: python is failed
+
+- debug: msg="{{python.stdout}}"
+
+- name: Parse output
+  set_fact:
+    Vendor: "{{ ( python.stdout | regex_search('cisco', ignorecase=True) ) | ternary('cisco','fortinet') }}"
+
+- debug: msg="{{Vendor}}"
